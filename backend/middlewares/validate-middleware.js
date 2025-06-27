@@ -11,6 +11,7 @@ const validate = (schema) => async(req, res, next) =>
     {
         const status = 422;
         const message = "Fill the required fields properly";
+        console.log(err);
         const extraDetails = err?.errors?.[0]?.message || "Validation failed";
         const error = {
             status,
@@ -18,7 +19,6 @@ const validate = (schema) => async(req, res, next) =>
             extraDetails,
         };
         //res.status(400).json({msg:message});
-        console.log(error);
         next(error);
     }
 }
