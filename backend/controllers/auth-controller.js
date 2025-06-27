@@ -31,7 +31,54 @@ const register = async(req,res) => {
     }
 };
 
-module.exports = {register};
+const login = async (req, res,next) =>
+{
+    try
+    {
+        const {email, password} = req.body;
+
+        //check if user exists or not.
+        const userExist = await User.findOne({email}).select("+password");//returns the entire details of the user 
+        // and the password field as well even thought it is not selected by default. (schema: password: {select: false})
+        if(!userExist)
+        {
+            return res.status(400).json({message:"User does not exist"});
+        }
+        
+        const user = await userExist.comparePassword(password);//comparing the password.
+        
+        if(user)
+        {
+            res.
+            status(200).
+            json({ 
+                    msg: "Login successful", 
+                    token: await userExist.generateToken(),
+                    userId: userExist._id.toString(), 
+                });
+        }
+        else
+        {
+            res.status(400).json({message:"Invalid Credentials"})
+        }
+    
+    } 
+    catch(error)
+    {
+        next(error);
+    }
+};
+
+const user = async (req,res) =>
+{
+    try {
+        const userData = req.user;
+        res.status(200).json({userData})
+    } catch (error) {
+        console.log(`Error: ${error}`);
+    }
+}
+module.exports = {register,login,user};
 
 // Note: The above code assumes that the User model has a generateToken method defined, 
 // which is used to create a JWT token for the user upon successful registration. 
