@@ -6,7 +6,6 @@ const documentSchema = Schema({
     type: String,
     required: true,
     trim: true,
-    default: "Untitled Document"
   },
   content: {
     type: String,

@@ -21,11 +21,11 @@ const authMiddleware = async (req, res, next) => //passing next is a must! to mo
     try
     {
         const isVerified = jwt.verify(jwtToken, process.env.JWT_SECRET); //they should match (.verify is provided by jwttoken);
-        console.log("Token verified:", isVerified);
+        // console.log("Token verified:", isVerified);
         const userData = await User.
                                 findOne({ _id : isVerified.id }).
                                 select({ password: 0});//to check the collection and find a user with a matching email and remove the password from the data received
-        console.log("User data:", userData);
+        // console.log("User data:", userData);
         req.user = userData;
         req.token = token;
         req.userID = userData._id.toString(); //passing custom information in the request. To pass information between middleware functions.
