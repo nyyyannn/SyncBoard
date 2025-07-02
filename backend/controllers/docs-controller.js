@@ -26,11 +26,14 @@ const getDocById = async (req, res, next) => {
     if (!doc) return res.status(404).json({ message: "Document not found" });
 
     const userId = req.userID.toString();
-    const isOwner = doc.owner.toString() === userId;
-    const isCollaborator = doc.collaborators.map(id => id.toString()).includes(userId);
+    const collaborators = Array.isArray(doc.collaborators) ? doc.collaborators : [];
 
-    if (!isOwner && !isCollaborator)
+    const isOwner = doc.owner.toString() === userId;
+    const isCollaborator = collaborators.map(id => id.toString()).includes(userId);
+
+    if (!isOwner && !isCollaborator) {
       return res.status(403).json({ message: "Access denied" });
+    }
 
     res.status(200).json(doc);
   } catch (error) {
