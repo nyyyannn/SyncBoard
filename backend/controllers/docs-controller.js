@@ -1,4 +1,5 @@
 const Document = require("../models/docs-model");
+const User = require("../models/user-model");
 
 const createDoc = async (req, res, next) => {
   try {
@@ -79,5 +80,35 @@ const getAllDocs = async (req, res, next) => {
   }
 };
 
+const inviteCollaborator = async (req,res,next) =>
+{
+  try{
+    const docId = req.params.id;
+    const {collaboaratorEmail} = req.body;
+    const requesterId = req.userID;
+    
+    const doc  = await Document.findById(docId);
+    if(!doc) return res.status(404).json({message: "Document not found"});
 
-module.exports = { createDoc, getDocById, getAllDocs };
+    if(doc.owner.toString() !== requesterId)
+      return res.status(403).json({message: "Only the owner can invite collaborators"});
+
+    const userToAdd = await User.findOne({email:collaboaratorEmail});
+    if(!userToAdd) return res.status(404).json({message: "User not found"});
+
+    const userIdtoAdd = userToAdd._id.toString();
+
+    if(doc.collaborators.map(id=>id.toString()).includes(userIdtoAdd))
+      return res.status(400).json({message: "User is already a collaborator"});
+
+    doc.collaborators.push(userToAdd._id);
+    await doc.save();
+
+    res.status(200).json({message:"Collaborator invited successfully"});
+  }
+  catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { createDoc, getDocById, getAllDocs,inviteCollaborator };
