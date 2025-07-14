@@ -8,5 +8,6 @@ const validate = require("../middlewares/validate-middleware");
 router.get("/", authMiddleware, getAllDocs);
 router.post("/create", authMiddleware, validate(createDocSchema), createDoc);
 router.get("/:id", authMiddleware, getDocById);
+route.post("/:id/invite", authMiddleware, inviteCollaborator);
 
 module.exports = router;
