@@ -122,7 +122,7 @@ const deleteDocById = async(req,res,next) =>
         return res.status(403).json({message:"You are not the owner"});
       }
       
-      await Document.deleteOne({_id:id});
+      await Document.deleteOne({_id:docId});
       return res.status(200).json({message: "Document deleted Successfully"});
     }
     catch(error)
