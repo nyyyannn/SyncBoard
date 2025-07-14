@@ -9,6 +9,6 @@ router.get("/", authMiddleware, getAllDocs);
 router.post("/create", authMiddleware, validate(createDocSchema), createDoc);
 router.get("/:id", authMiddleware, getDocById);
 router.post("/:id/invite", authMiddleware, inviteCollaborator);
-router.post("/:id/delete",authMiddleware, deleteDocById);
+router.delete("/:id/delete",authMiddleware, deleteDocById);
 
 module.exports = router;
