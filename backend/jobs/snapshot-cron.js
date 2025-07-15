@@ -3,7 +3,7 @@
 /*Cron is used to periodically save document content for versioning and recovery and used mainly for rollback, undo, backups */
 
 const cron = require('node-cron');
-const document = require('../models/docs-model');
+const Document = require('../models/docs-model');
 const saveSnapshot = require('../utils/saveSnapshot');
 
 cron.schedule("*/2 * * * *", async ()=> /* saves every 2 minutes */
