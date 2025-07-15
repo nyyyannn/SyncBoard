@@ -6,7 +6,7 @@ const cron = require('node-cron');
 const document = require('../models/docs-model');
 const saveSnapshot = require('../utils/saveSnapshot');
 
-crons.schedule("*/2 * * * *", async ()=> /* saves every 2 minutes */
+cron.schedule("*/2 * * * *", async ()=> /* saves every 2 minutes */
 {
     try{
         const docs = await Document.find(); /*find all docs*/
