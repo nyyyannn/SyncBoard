@@ -24,10 +24,25 @@ app.use('/api/liveblocks', liveblocksRoutes);
 // Error handling middleware
 app.use(errorMiddleware);
 
-connectDB();
+const startServer = async() =>
+{
+  try
+  {
+    await connectDB();
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+    require("./jobs/snapshot-cron"); /*crons starts runing in the background*/
+
+    app.listen(port,()=>{
+      console.log("Server running correctly");
+    })
+  }
+  catch(err)
+  {
+    console.error("Failed to start server",err);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 
