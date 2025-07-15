@@ -32,7 +32,7 @@ const startServer = async() =>
 
     require("./jobs/snapshot-cron"); /*crons starts runing in the background, always include after doing connecting the DB*/
 
-    app.listen(port,()=>{
+    app.listen(PORT,()=>{
       console.log("Server running correctly");
     })
   }
