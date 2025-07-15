@@ -131,4 +131,25 @@ const deleteDocById = async(req,res,next) =>
     }
 }
 
-module.exports = { createDoc, getDocById, getAllDocs,inviteCollaborator,deleteDocById };
+const getDocVersions = async(req, res, next) =>
+{
+  try
+  {
+    const docId=req.params.id;
+    const doc=await Document.findById(docId);
+
+    if(!doc)
+      return res.status(404).json({message:"Document not found"});
+
+    const versions = doc.versions.sort((a,b)=>b.savedAt-a.savedAt).slice(0,20);/*reverse order*/
+
+    res.status(200).json(versions);
+
+  }
+  catch(error)
+  {
+    next(error);
+  }
+}
+
+module.exports = { createDoc, getDocById, getAllDocs,inviteCollaborator,deleteDocById, getDocVersions };
