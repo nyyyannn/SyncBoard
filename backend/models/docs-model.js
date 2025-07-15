@@ -22,6 +22,12 @@ const documentSchema = Schema({
       ref: "User",
       default:[]
     }
+  ],
+  versions: [
+    {
+      content: {type: String},
+      savedAt: {type: Date, default: Date.now}
+    }
   ]
 }, { timestamps: true });
 
