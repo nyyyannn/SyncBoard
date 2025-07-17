@@ -5,10 +5,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) =>
 {
     const [token,setToken] = useState(localStorage.getItem('token'));
-    const [user, setUser] = useState(() => {
-    const data = localStorage.getItem("user");
-    return data ? JSON.parse(data) : null;
-  });
+    const [user, setUser] = useState("");
     const [isLoading,setIsLoading] = useState(true);
 
     const API = import.meta.env.VITE_APP_URI;
@@ -61,14 +58,6 @@ export const AuthProvider = ({children}) =>
         }
     };
 
-    const login = (token, userData) =>
-    {
-        setToken(token);
-        setUser(userData);
-        localStorage.setItem("token",token);
-        localStorage.setItem("user",userData);
-    };
-
     useEffect(()=>
     {
         userAuthentication();
@@ -77,7 +66,6 @@ export const AuthProvider = ({children}) =>
     return(
         <AuthContext.Provider value={{
             storeTokenInLS,
-            login,
             logout,
             user,
             isLoading,
