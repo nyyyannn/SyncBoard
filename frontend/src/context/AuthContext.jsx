@@ -7,6 +7,7 @@ export const AuthProvider = ({children}) =>
     const [token,setToken] = useState(localStorage.getItem('token'));
     const [user, setUser] = useState("");
     const [isLoading,setIsLoading] = useState(true);
+    const authorizationToken = `Bearer ${token}`;
 
     const API = import.meta.env.VITE_APP_URI;
 
@@ -28,7 +29,6 @@ export const AuthProvider = ({children}) =>
         try
         {
             setIsLoading(true);
-            const authorizationToken = `Bearer ${token}`;
             const response = await fetch(`${API}/api/auth/user`,{
                 method:"GET",
                 headers:
