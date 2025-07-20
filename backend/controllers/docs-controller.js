@@ -28,7 +28,7 @@ const createDoc = async (req, res, next) => {
 
 const getDocById = async (req, res, next) => {
   try {
-    const doc = await Document.findById(req.params.id);
+    const doc = await Document.findById(req.params.id).select("-versions"); //removing lengthy versions array
 
     if (!doc) return res.status(404).json({ message: "Document not found" });
 
@@ -48,26 +48,28 @@ const getAllDocs = async (req, res, next) => {
     const limit = 10; // 10 documents per page
     const skip = (page - 1) * limit;
 
-    const titleQuery = req.query.title // gets the title from query params
-      ? { title: { $regex: req.query.title, $options: "i" } } // i = case-insensitive
-      : {};
+    const filter = {
+      $or:[{owner: userId},{collaborators: userId}],
+    };
 
-    const docs = await Document.find({
-      $and: [ //$and is a logical operator that matches documents that satisfy all the specified conditions
-        {
-          $or: [
-            { owner: userId }, //(OR)
-            { collaborators: userId }
-          ]
-        }, //(AND)
-        titleQuery //returns documents in which the user is either the owner OR a collaborator AND the title matches the search query
-      ]
-    })
-      .sort({ updatedAt: -1 })
+    if(req.query.title){
+      filter.title = {$regex: req.query.title, $options: "i"}; //i=case-insensitive
+    }
+
+    const [docs, totalDocs] = await Promise.all([
+      Document.find(filter)
+      .sort({updatedAt: -1})
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .select("_id title owner updatedAt collaborators"),
+      Document.countDocuments(filter),
+    ])
 
-    res.status(200).json(docs);
+    res.status(200).json({
+      documents: docs,
+      currentPage: page,
+      totalPage: Math.ceil(totalDocs/limit),
+    })
   } 
   catch (error) {
     next(error);
@@ -80,23 +82,23 @@ const inviteCollaborator = async (req,res,next) =>
     const docId = req.params.id;
     const {collaboratorEmail} = req.body;
     const requesterId = req.userID;
-    
-    const doc  = await Document.findById(docId);
-    if(!doc) return res.status(404).json({message: "Document not found"});
-
-    if(doc.owner.toString() !== requesterId)
-      return res.status(403).json({message: "Only the owner can invite collaborators"});
-
+  
     const userToAdd = await User.findOne({email:collaboratorEmail});
     if(!userToAdd) return res.status(404).json({message: "User not found"});
 
-    const userIdtoAdd = userToAdd._id.toString();
+    if(userToAdd._id.toString() === requesterId){
+      return res.status(400).json({message: "You cannot invite yourself."});
+    }
 
-    if(doc.collaborators.map(id=>id.toString()).includes(userIdtoAdd))
-      return res.status(400).json({message: "User is already a collaborator"});
-
-    doc.collaborators.push(userToAdd._id);
-    await doc.save();
+    const updatedDoc = await Document.findOneAndUpdate(
+      { _id: docId, owner: requesterId }, // to check if the doc exists and the owner is the requesterID
+      { $addToSet: { collaborators: userToAdd._id } }, //add to a set (to ensure no duplicates)
+      { new: true } // Options: Return the updated document
+    );
+    
+    if(!updatedDoc){
+      return res.status(400).json({message: "Document not found or you are not the owner"});
+    }
 
     res.status(200).json({message:"Collaborator invited successfully"});
   }
@@ -112,17 +114,14 @@ const deleteDocById = async(req,res,next) =>
       const docId = req.params.id;
       const userId = req.userID;
 
-      const doc = await Document.findById(docId);
+    const result  = await Document.findOneAndDelete({_id:docId, owner:userId});
+    
+    if(!result){
+      return res.status(404).json({
+        message: "Document not found or you do not have permission to delete it"
+      });
+    }
       
-      if(!doc)
-        return res.status(404).json({message:"Document not found"});
-
-      if(doc.owner.toString()!=userId)
-      {
-        return res.status(403).json({message:"You are not the owner"});
-      }
-      
-      await Document.deleteOne({_id:docId});
       return res.status(200).json({message: "Document deleted Successfully"});
     }
     catch(error)
@@ -136,10 +135,14 @@ const getDocVersions = async(req, res, next) =>
   try
   {
     const docId=req.params.id;
-    const doc=await Document.findById(docId);
+    const doc=await Document.findById(docId).select("versions owner collaborators");
 
     if(!doc)
       return res.status(404).json({message:"Document not found"});
+
+    if(!hasAccess(req.userID,doc)){
+      return res.status(403).json({message: "Access Denied"});
+    }
 
     const versions = doc.versions.sort((a,b)=>b.savedAt-a.savedAt).slice(0,20);/*reverse order*/
 
