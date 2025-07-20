@@ -155,4 +155,4 @@ const getDocVersions = async(req, res, next) =>
   }
 }
 
-module.exports = { createDoc, getDocById, saveSnapshot, getAllDocs,inviteCollaborator,deleteDocById, getDocVersions };
+module.exports = { createDoc, getDocById, getAllDocs,inviteCollaborator,deleteDocById, getDocVersions };
