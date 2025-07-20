@@ -37,10 +37,10 @@ const Login = () => {
   return (
     <form onSubmit={handleSubmit}>
       <label>Email: </label>
-      <input name="email" className="border-2 mt-5" type="email" placeholder="Email" onChange={handleChange} />
+      <input name="email" required className="border-2 mt-5" type="email" placeholder="Email" onChange={handleChange} />
       <br/>
       <label>Password: </label>
-      <input name="password" type="password" className="border-2 mt-5" placeholder="Password" onChange={handleChange} />
+      <input name="password" required type="password" className="border-2 mt-5" placeholder="Password" onChange={handleChange} />
       <br/>
       <button type="submit" className="mt-5 border-3 ml-5">Login</button>
     </form>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function Dashboard() {
   // State for documents, current page, and total pages
@@ -10,9 +11,13 @@ function Dashboard() {
   
   const { API, token } = useAuth();
 
+  const navigate = useNavigate();
+
   // useEffect will re-run whenever currentPage changes
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      navigate("/login");
+    }
 
     const fetchDocs = async () => {
       setIsLoading(true);
