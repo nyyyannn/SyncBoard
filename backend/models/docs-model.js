@@ -31,7 +31,10 @@ const docSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
-    versions: [versionSchema]
+    versions: [versionSchema],
+    lastSnapshotAt:{
+      type: Date
+    }
 }, {
     timestamps: true // Automatically manage createdAt and updatedAt
 });

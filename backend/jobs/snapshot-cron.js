@@ -9,7 +9,17 @@ const saveSnapshot = require('../utils/saveSnapshot');
 cron.schedule("*/2 * * * *", async ()=> /* saves every 2 minutes */
 {
     try{
-        const docs = await Document.find(); /*find all docs*/
+        const docs = await Document.find({
+            $or:[
+                { lastSnapshotAt: { $exists: false} },
+                { $expr: { $gt: ["$updatedAt", "$lastSnapshotAt"] } }
+            ]
+        }).select("_id"); /*find all docs*/
+
+        if(docs.length===0)
+        {
+            return;
+        }
 
         for(const doc of docs)
         {
