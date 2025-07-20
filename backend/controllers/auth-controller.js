@@ -1,7 +1,7 @@
 const User = require("../models/user-model");
 const bcrypt = require("bcrypt");
 
-const register = async(req,res) => {
+const signup = async(req,res) => {
     try
     {
         //Get registration data
@@ -78,7 +78,7 @@ const user = async (req,res) =>
         console.log(`Error: ${error}`);
     }
 }
-module.exports = {register,login,user};
+module.exports = {signup,login,user};
 
 // Note: The above code assumes that the User model has a generateToken method defined, 
 // which is used to create a JWT token for the user upon successful registration. 
