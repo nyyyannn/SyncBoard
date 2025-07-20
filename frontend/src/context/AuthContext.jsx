@@ -70,6 +70,7 @@ export const AuthProvider = ({children}) =>
             user,
             isLoading,
             token,
+            API
         }}>
             {children}
         </AuthContext.Provider>
