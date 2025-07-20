@@ -68,7 +68,7 @@ const getAllDocs = async (req, res, next) => {
     res.status(200).json({
       documents: docs,
       currentPage: page,
-      totalPage: Math.ceil(totalDocs/limit),
+      totalPages: Math.ceil(totalDocs/limit),
     })
   } 
   catch (error) {
@@ -97,7 +97,7 @@ const inviteCollaborator = async (req,res,next) =>
     );
     
     if(!updatedDoc){
-      return res.status(400).json({message: "Document not found or you are not the owner"});
+      return res.status(404).json({message: "Document not found or you are not the owner"});
     }
 
     res.status(200).json({message:"Collaborator invited successfully"});
