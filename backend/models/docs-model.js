@@ -1,35 +1,40 @@
 const mongoose = require("mongoose");
-const {Schema, model} = mongoose;
+const { Schema } = mongoose;
 
-const documentSchema = Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  content: {
-    type: String,
-    default: ""
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-  collaborators: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default:[]
+const versionSchema = new Schema({
+    content: {
+        type: String,
+        required: true
+    },
+    savedAt: {
+        type: Date,
+        default: Date.now
     }
-  ],
-  versions: [
-    {
-      content: {type: String},
-      savedAt: {type: Date, default: Date.now}
-    }
-  ]
-}, { timestamps: true });
+});
 
-const Document = model("Document", documentSchema);
+const docSchema = new Schema({
+    title: {
+        type: String,
+        required: [true, "Document title is required."],
+        trim: true // Automatically remove leading/trailing whitespace
+    },
+    content: {
+        type: String,
+    },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User', // Creates a link to the User model
+        required: true,
+        index: true // for faster lookups
+    },
+    collaborators: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    versions: [versionSchema]
+}, {
+    timestamps: true // Automatically manage createdAt and updatedAt
+});
+
+const Document = mongoose.model("Document", docSchema);
 module.exports = Document;
