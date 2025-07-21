@@ -61,13 +61,15 @@ function Dashboard() {
       <h1>Your Documents</h1>
       {isLoading ? (
         <p>Loading...</p>
-      ) : (
+      ) : docs.length > 0 ? (
         docs.map((doc) => (
           <div key={doc._id}>
             <h3>{doc.title}</h3>
             <p>Last updated: {new Date(doc.updatedAt).toLocaleDateString()}</p>
           </div>
         ))
+      ):(
+        <p>You haven't created any documents yet. Click the "Create" button to get started!</p>
       )}
       
       {/* Pagination Controls */}
