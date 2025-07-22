@@ -111,10 +111,10 @@ function Dashboard() {
   }
 
   const renderContent=()=>{
-    if(isLoading) return <p>Loading documents....</p>;
-    if(error) return <p>{error}</p>;
+    if(isLoading) return <p>Loading documents....</p>
+    if(error) return <p>{error}</p>
     if(docs.length===0)
-      return <p>You haven't created any documents yet. Create one to get started!</p>;
+      return <p>You haven't created any documents yet. Create one to get started!</p>
     
     return docs.map((doc) => (
           <div key={doc._id}>
