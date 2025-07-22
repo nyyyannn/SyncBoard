@@ -1,4 +1,5 @@
 import {useMemo } from 'react';
+import { createEditor } from "slate";
 import {Slate, Editable, withReact} from 'slate-react';
 import {withHistory} from 'slate-history';
 import {useStorage,useOthers,useMutation} from "@liveblocks/react";
