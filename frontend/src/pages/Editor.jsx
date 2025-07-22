@@ -1,6 +1,6 @@
 import CollaborativeEditor from "../components/CollaborativeEditor";
 import { useParams } from "react-router-dom";
-import { RoomProvider } from "@liveblocks/react/suspense";
+import { RoomProvider } from "@liveblocks/react";
 import {useAuth} from "../context/AuthContext";
 
 const Editor = () => {

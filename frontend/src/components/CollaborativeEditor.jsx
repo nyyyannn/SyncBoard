@@ -1,11 +1,7 @@
-import { useEffect, useMemo } from 'react';
-import { useMyPresence } from "@liveblocks/react/suspense";
+import {useMemo } from 'react';
 import {Slate, Editable, withReact} from 'slate-react';
 import {withHistory} from 'slate-history';
-import {useStorage,useOthers,useUpdateMyPresence} from "@liveblocks/react";
-
-
-const userColor = "#"+Math.floor(Math.random()*16777215).toString(16);
+import {useStorage,useOthers,useMutation} from "@liveblocks/react";
 
 
 const PresenceAvatars = () => {
@@ -34,7 +30,10 @@ const PresenceAvatars = () => {
 
 const CollaborativeEditor = () => {
 
-  const other = useOthers();
+  // At the top of your CollaborativeEditor component:
+const updateContent = useMutation(({ storage }, newValue) => {
+    storage.get("docContent").replace(newValue);
+}, []);
 
   const docContent = useStorage(root=>root.docContent);
 
@@ -61,7 +60,7 @@ const CollaborativeEditor = () => {
           key={JSON.stringify(docContent)} //Every time the shared data changes from another user, this key change will re-render new content
 
           onChange={newValue => {
-            console.log("Local change",newValue)
+            updateContent(newValue)
           }}
           >
 
