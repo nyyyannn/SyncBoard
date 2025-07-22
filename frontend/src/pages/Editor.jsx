@@ -19,11 +19,11 @@ const Editor = () => {
 
   return (
     <RoomProvider 
-    id={docId}
+    id={docId} //must, creates room if it doesn't already exist
     publicApiKey={publicAPI}
     
-    initialPresence={{
-      cursor: null,
+    initialPresence={{ //each user has their own presence. Resets everytime they disconnect
+      cursor: null, 
       userInfo:{
         name:user.username||"Anonymous",
         color:userColor,
