@@ -1,8 +1,15 @@
-import {useMemo } from 'react';
+import {Children, useCallback, useEffect, useMemo } from 'react';
 import { createEditor } from "slate";
 import {Slate, Editable, withReact} from 'slate-react';
 import {withHistory} from 'slate-history';
 import {useStorage,useOthers,useMutation} from "@liveblocks/react";
+
+const INITIAL_CONTENT = [
+  {
+    type: 'paragraph',
+    children: [{text:''}],
+  }
+];
 
 
 const PresenceAvatars = () => {
@@ -18,6 +25,19 @@ const PresenceAvatars = () => {
           <div
             key = {connectionId}
             title = {presence.userInfo.name}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: presence.userInfo.color,
+              color: 'white',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontWeight: 'bold',
+              border: '2px solid white',
+              boxShadow: '0 0 5px rgba(0,0,0,0.3)'
+            }}
           >
 
             {presence.userInfo.name.charAt(0).toUpperCase()}
@@ -29,16 +49,34 @@ const PresenceAvatars = () => {
   )
 }
 
-const CollaborativeEditor = () => {
-
-  // At the top of your CollaborativeEditor component:
-const updateContent = useMutation(({ storage }, newValue) => {
-    storage.get("docContent").replace(newValue);
-}, []);
+const CollaborativeEditor = () =>{
 
   const docContent = useStorage(root=>root.docContent);
 
+  const updateContent = useMutation(({ storage }, newValue) => {
+      storage.get("docContent").replace(newValue);
+  }, []);
+
+  const initializeDocument = useMutation(({storage})=>{
+    const content = storage.get("docContent");
+    if(content==null)
+    {
+      storage.set("docContent",INITIAL_CONTENT);
+    }
+  },[]);
+
+  useEffect(() => {
+    if(docContent!==null)
+    {
+        initializeDocument();   
+    }
+  }, [initializeDocument, docContent]);
+
   const editor = useMemo(()=> withHistory(withReact(createEditor())),[]);
+
+  const handleOnChange = useCallback((newValue)=>{
+    updateContent(newValue);
+  },[updateContent]);
 
   if(docContent == null)
   {
@@ -60,20 +98,19 @@ const updateContent = useMutation(({ storage }, newValue) => {
 
           key={JSON.stringify(docContent)} //Every time the shared data changes from another user, this key change will re-render new content
 
-          onChange={newValue => {
-            updateContent(newValue)
-          }}
+          onChange={handleOnChange}
           >
 
           <Editable
             placeholder="Start typing here. Write away to glory!"
+            style={{minHeight:'150px', padding:'0 1rem'}}
+            autoFocus
           />
 
-
-          </Slate>
+        </Slate>
       </div>
     </>
   )
 }
 
-export default CollaborativeEditor
+export default CollaborativeEditor;
