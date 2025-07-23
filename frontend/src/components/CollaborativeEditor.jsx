@@ -54,7 +54,7 @@ const CollaborativeEditor = () =>{
   const docContent = useStorage(root=>root.docContent);
 
   const updateContent = useMutation(({ storage }, newValue) => {
-      storage.get("docContent").replace(newValue);
+      storage.set("docContent",newValue);
   }, []);
 
   const initializeDocument = useMutation(({storage})=>{
